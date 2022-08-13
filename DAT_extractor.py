@@ -9,18 +9,25 @@ import re
 
 def dat_ext_type1(*args):
     try:
+        
         print("running dat_ext_type1")
         current_filename = args[1]
         start_offset = args[2]
         file_offsets = []
         file_sizes = []
+
+        zero_offset_list = []
+        zero_offset_file = "./" + current_filename + ".zof"
+
         dat_ext.seek(start_offset, 0)
         nof = int.from_bytes(dat_ext.read(4), "little")
         for x in range(nof):
             f_offset = dat_ext.read(4)
             file_offsets.append(int.from_bytes(f_offset, "little") + start_offset)
         while 0 in file_offsets:
-            file_offsets.remove(0)
+            current_zero_offset = file_offsets.index(0)
+            zero_offset_list.append(current_zero_offset)
+            file_offsets.pop(current_zero_offset)
             nof -= 1
         file_offsets.append(file_size_check)
         if os.path.isdir(current_filename):
@@ -46,6 +53,11 @@ def dat_ext_type1(*args):
             extracted_file.close()
             file_number += 1
             sub_itir += 1
+
+            with open(zero_offset_file, 'wb') as ZOF:
+                for element in zero_offset_list:
+                    ZOF.write(element.to_bytes(byteorder="little", length=4))
+
         return None
     except Exception as error:
         print(current_filename, "error")
