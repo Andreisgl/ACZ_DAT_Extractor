@@ -41,7 +41,8 @@ def create_header(curr_container_folder):
     for file in os.listdir(curr_container_folder):
         path = os.path.join(curr_container_folder, file)
         file_size_list.append(os.path.getsize(path))
-        
+    
+    # Add old '0' offsets from original file through .zof file
     with open(zof_file, 'rb') as ZOF:
         zof_size = os.path.getsize(zof_file)
         for offset in range(int(zof_size /4)):
