@@ -93,8 +93,7 @@ def pack_files(curr_container_folder, output_file):
 
 
 
-#check_files()
-# create_header(test_folder)
+
 check_files()
 
 pack_files(test_folder, output_dat)
