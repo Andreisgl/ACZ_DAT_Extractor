@@ -13,7 +13,7 @@ basedir = ''
 
 test_folder = "./0003"
 
-test_output_dat = "out_dat.dat"
+output_dat = "out_dat.dat"
 
 
 def check_files():
@@ -68,14 +68,34 @@ def create_header(curr_container_folder):
             offset_list.insert( int(data) +1, 0 )
     offset_list.pop()
     
-    with open(test_output_dat, 'wb') as OD:
-        for item in offset_list:
-            xx = item.to_bytes(byteorder="little", length=4)
-            OD.write(xx)
+    #with open(test_output_dat, 'wb') as OD:
+    #    for item in offset_list:
+    #        xx = item.to_bytes(byteorder="little", length=4)
+    #        OD.write(xx)
+
+    return offset_list
         
-    print('end')
+# Packs the file. Receives current container and destination file.
+def pack_files(curr_container_folder, output_file):
+    # Get header values
+    header_list = create_header(curr_container_folder)
+
+    with open(output_file, 'wb') as OF:
+        # Write header to file
+        for item in header_list:
+            OF.write(item.to_bytes(byteorder="little", length=4))
+        
+        for f in os.listdir(curr_container_folder):
+            path = os.path.join(curr_container_folder, f)
+            with open(path, 'rb') as infile:
+                OF.write(infile.read())
+            
 
 
 
 #check_files()
-create_header(test_folder)
+# create_header(test_folder)
+check_files()
+
+pack_files(test_folder, output_dat)
+print("end")
