@@ -34,6 +34,7 @@ def check_files():
 def create_header(curr_container_folder):
     num_of_files = len( os.listdir(curr_container_folder) )
     file_size_list = []
+    offset_list = []
     # Point to .zof file
     zof_file = curr_container_folder + '.zof'
 
@@ -42,13 +43,36 @@ def create_header(curr_container_folder):
         path = os.path.join(curr_container_folder, file)
         file_size_list.append(os.path.getsize(path))
     
+    # Create offset list. (WILL BE OFFSET LATER ACCORDING TO HEADER LENGTH!)
+    offset_list.append(0)
+    for index in range(len(file_size_list)):
+        offset_list.append(file_size_list[index] + offset_list[index])
+    
+
+    header_length = (len(offset_list) + 1) * 4
+    for index in range(len(offset_list)):
+        offset_list[index] += header_length
+    
+    offset_list.insert(0, len(offset_list))
+
+    
+    
+    # Add total size to beginning of list
+    file_size_list.insert(0, len(file_size_list))
+
     # Add old '0' offsets from original file through .zof file
     with open(zof_file, 'rb') as ZOF:
         zof_size = os.path.getsize(zof_file)
         for offset in range(int(zof_size /4)):
             data = int.from_bytes(ZOF.read(4), byteorder = "little")
-            file_size_list.insert( int(data), 0 )
+            offset_list.insert( int(data) +1, 0 )
+    offset_list.pop()
     
+    with open(test_output_dat, 'wb') as OD:
+        for item in offset_list:
+            xx = item.to_bytes(byteorder="little", length=4)
+            OD.write(xx)
+        
     print('end')
 
 
