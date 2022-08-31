@@ -9,16 +9,22 @@ import textwrap
 import shutil
 import re
 
-ignore_folder_list = [".git"] # Hardcoded folders to ignore AKA ".git" is annoying
+
 
 basedir = ""
 folder_path_list = []
 folder_list = []
+zof_folder = "zof"
 
+ignore_folder_list = [".git", zof_folder] # Hardcoded folders to ignore AKA ".git" is annoying
 
 def check_files():
     ##Get working directory path
+    global basedir
     basedir = os.getcwd()
+
+    global zof_folder
+    zof_folder = basedir + "/" + zof_folder
 
     
     for f in os.listdir(basedir):
@@ -34,7 +40,8 @@ def create_header(curr_container_folder):
     file_size_list = []
     offset_list = []
     # Point to .zof file
-    zof_file = curr_container_folder + '.zof'
+    
+    zof_file = zof_folder + "/" + curr_container_folder + '.zof'
 
     # Get file sizes for header
     for file in os.listdir(curr_container_folder):
@@ -62,7 +69,7 @@ def create_header(curr_container_folder):
                 data = int.from_bytes(ZOF.read(4), byteorder = "little") # Read position of 0 offset
                 offset_list.insert( int(data), 0 ) # Insert 0 in the required position
     except:
-        print(".zof exception!")
+        print(".zof exception!:  " + curr_container_folder)
 
     offset_list.pop()
     offset_list.insert(0, len(offset_list))
@@ -73,6 +80,7 @@ def create_header(curr_container_folder):
     file_size_list.insert(0, len(file_size_list)) # Unnecessary?
 
     # Add padding to the end of the header to close the 16-byte line
+    padding_length = 0
     len_offset_list = len(offset_list)
     if len_offset_list % 4 != 0:
         padding_length = 4* ((4*(int(len_offset_list/4) + 1)) - len_offset_list)

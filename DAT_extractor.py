@@ -17,7 +17,10 @@ def dat_ext_type1(*args):
         file_sizes = []
 
         zero_offset_list = []
-        zero_offset_file = "./" + current_filename + ".zof"
+        zof_folder = "zof"
+        zero_offset_file = "./" + zof_folder + "/" + current_filename + ".zof"
+        if not os.path.exists(zof_folder):
+            os.mkdir(zof_folder)
 
         dat_ext.seek(start_offset, 0)
         nof = int.from_bytes(dat_ext.read(4), "little")
