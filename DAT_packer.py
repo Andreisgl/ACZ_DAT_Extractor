@@ -50,6 +50,7 @@ def create_header(curr_container_folder):
     
 
     header_length = (len(offset_list) + 4) * 4
+    # Add header lenght to all values to display the real values of the final file
     for index in range(len(offset_list)):
         offset_list[index] += header_length
     
@@ -58,18 +59,12 @@ def create_header(curr_container_folder):
     try:
         # Add old '0' offsets from original file through .zof file
         with open(zof_file, 'rb') as ZOF:
-            zof_size = os.path.getsize(zof_file)
-            for offset in range(int(zof_size /4)):
-                data = int.from_bytes(ZOF.read(4), byteorder = "little")
-                offset_list.insert( int(data), 0 )
-        #offset_list.pop() # SHOULD THIS EXIST??
+            zof_size = os.path.getsize(zof_file) # Get file size and...
+            for offset in range(int(zof_size /4)): # ...get the number of offsets present in file
+                data = int.from_bytes(ZOF.read(4), byteorder = "little") # Read position of 0 offset
+                offset_list.insert( int(data), 0 ) # Insert 0 in the required position
     except:
         print(".zof exception!")
-
-    #with open(test_output_dat, 'wb') as OD:
-    #    for item in offset_list:
-    #        xx = item.to_bytes(byteorder="little", length=4)
-    #        OD.write(xx)
 
     offset_list.pop()
     offset_list.insert(0, len(offset_list))
