@@ -9,6 +9,8 @@ import textwrap
 import shutil
 import re
 
+ignore_folder_list = [".git"] # Hardcoded folders to ignore AKA ".git" is annoying
+
 basedir = ''
 
 test_folder = "./0251"
@@ -25,9 +27,9 @@ def check_files():
     for f in os.listdir(basedir):
         path = os.path.join(basedir, f)
         if os.path.isdir(f):
-            file_list.append(path)
-            folder_list.append(os.path.splitext(f)[0])
-    print()
+            if not f in ignore_folder_list:
+                file_list.append(path)
+                folder_list.append(os.path.splitext(f)[0])
 
 
 
