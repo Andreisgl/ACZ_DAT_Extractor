@@ -49,8 +49,8 @@ def create_header(curr_container_folder):
         offset_list.append(file_size_list[index] + offset_list[index])
     
 
-    header_length = (len(offset_list) + 4) * 4
-    # Add header lenght to all values to display the real values of the final file
+    header_length = (len(offset_list) + 4) * 4 # I don't remember why add 4, but it only works like this...
+    # Add header length to all values to display the real values of the final file
     for index in range(len(offset_list)):
         offset_list[index] += header_length
     
@@ -72,7 +72,7 @@ def create_header(curr_container_folder):
     
     
     # Add total size to beginning of list
-    file_size_list.insert(0, len(file_size_list))
+    file_size_list.insert(0, len(file_size_list)) # Unnecessary?
 
     # Add padding to the end of the header to close the 16-byte line
     len_offset_list = len(offset_list)
