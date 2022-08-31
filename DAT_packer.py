@@ -21,12 +21,13 @@ def check_files():
     basedir = os.getcwd()
 
     file_list = []
-    file_name = []
+    folder_list = []
     for f in os.listdir(basedir):
         path = os.path.join(basedir, f)
         if os.path.isdir(f):
             file_list.append(path)
-            file_name.append(os.path.splitext(f)[0])
+            folder_list.append(os.path.splitext(f)[0])
+    print()
 
 
 
