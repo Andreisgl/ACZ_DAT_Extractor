@@ -53,16 +53,22 @@ def create_header(curr_container_folder):
     for index in range(len(file_size_list)):
         offset_list.append(file_size_list[index] + offset_list[index])
     
+    #Check .zof file to know how many header positions are missing
+    try:
+        with open(zof_file, 'rb') as ZOF:
+            additional_zeros_in_header = int(os.path.getsize(zof_file) /4)         
+    except:
+        print(".zof size check exception!:  " + curr_container_folder)
 
-    header_length = (len(offset_list) + 4) * 4 # I don't remember why add 4, but it only works like this...
+    # I don't remember why add 4, but it only works like this...
+    header_length = ((len(offset_list)) + additional_zeros_in_header) * 4
+    
     # Add header length to all values to display the real values of the final file
     for index in range(len(offset_list)):
         offset_list[index] += header_length
     
-    
-
     try:
-        # Add old '0' offsets from original file through .zof file
+        # Add old missing '0' offsets from original file through .zof file
         with open(zof_file, 'rb') as ZOF:
             zof_size = os.path.getsize(zof_file) # Get file size and...
             for offset in range(int(zof_size /4)): # ...get the number of offsets present in file
