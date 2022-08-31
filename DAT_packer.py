@@ -2,6 +2,7 @@
 ## Based on ACZ DAT_extractor by death_the_d0g (death_the_d0g @ Twitter and deaththed0g @ Github)
 
 from cgi import test
+from email import header
 import os
 from string import ascii_letters, digits
 ##import traceback
@@ -60,8 +61,13 @@ def create_header(curr_container_folder):
     except:
         print(".zof size check exception!:  " + curr_container_folder)
 
-    # I don't remember why add 4, but it only works like this...
+    # If header doesn't complete the last 16-byte line, add padding
+    # to the end of the list
     header_length = ((len(offset_list)) + additional_zeros_in_header) * 4
+    if header_length % 16 != 0:
+        # Number of bytes to be added to the list at the end of the process
+        padding_length = int(((16 * (int(header_length/16) + 1)) - header_length) /4)
+        header_length += padding_length*4 # Add padding to header size
     
     # Add header length to all values to display the real values of the final file
     for index in range(len(offset_list)):
@@ -80,32 +86,21 @@ def create_header(curr_container_folder):
     offset_list.pop()
     offset_list.insert(0, len(offset_list))
 
-    
-    
-    # Add total size to beginning of list
-    file_size_list.insert(0, len(file_size_list)) # Unnecessary?
-
-    # Add padding to the end of the header to close the 16-byte line
-    padding_length = 0
-    len_offset_list = len(offset_list)
-    if len_offset_list % 4 != 0:
-        padding_length = 4* ((4*(int(len_offset_list/4) + 1)) - len_offset_list)
-
-    return offset_list, padding_length
+    # Add padding to end of the list
+    for i in range(padding_length):
+        offset_list.append(0)
+    return offset_list
         
 # Packs the file. Receives current container and destination file.
 def pack_files(curr_container_folder, output_file):
     # Get header values
-    header_list, header_padding = create_header(curr_container_folder)
+    header_list = create_header(curr_container_folder)
 
 
     with open(output_file, 'wb') as OF:
         # Write header to file
         for item in header_list:
             OF.write(item.to_bytes(byteorder="little", length=4))
-        padding_digit = 0
-        for digit in range(header_padding):
-            OF.write(padding_digit.to_bytes(byteorder="little", length=1))
         
         for f in os.listdir(curr_container_folder):
             path = os.path.join(curr_container_folder, f)
