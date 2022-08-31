@@ -11,7 +11,9 @@ import re
 
 ignore_folder_list = [".git"] # Hardcoded folders to ignore AKA ".git" is annoying
 
-basedir = ''
+basedir = ""
+folder_path_list = []
+folder_list = []
 
 test_folder = "./0251"
 
@@ -22,14 +24,14 @@ def check_files():
     ##Get working directory path
     basedir = os.getcwd()
 
-    file_list = []
-    folder_list = []
+    
     for f in os.listdir(basedir):
         path = os.path.join(basedir, f)
         if os.path.isdir(f):
             if not f in ignore_folder_list:
-                file_list.append(path)
+                folder_path_list.append(path)
                 folder_list.append(os.path.splitext(f)[0])
+    print()
 
 
 
