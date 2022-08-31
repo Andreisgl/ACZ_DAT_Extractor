@@ -27,11 +27,18 @@ def dat_ext_type1(*args):
         for x in range(nof):
             f_offset = dat_ext.read(4)
             file_offsets.append(int.from_bytes(f_offset, "little") + start_offset)
-        while 0 in file_offsets:
-            current_zero_offset = file_offsets.index(0)
+
+        search_start = 0
+        for i in range(file_offsets.count(0)): #Count occurrences of 0 in file_offsets
+            current_zero_offset = file_offsets.index(0, search_start)
             zero_offset_list.append(current_zero_offset)
-            file_offsets.pop(current_zero_offset)
+            search_start = current_zero_offset + 1
             nof -= 1
+            
+        while 0 in file_offsets: # Remove all 0 offsets from file_offsets list
+            current_zero_offset = file_offsets.index(0)
+            file_offsets.pop(current_zero_offset)
+
         file_offsets.append(file_size_check)
         if os.path.isdir(current_filename):
             shutil.rmtree(current_filename)
