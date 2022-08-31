@@ -15,10 +15,6 @@ basedir = ""
 folder_path_list = []
 folder_list = []
 
-test_folder = "./0251"
-
-output_dat = "out_dat.dat"
-
 
 def check_files():
     ##Get working directory path
@@ -31,9 +27,6 @@ def check_files():
             if not f in ignore_folder_list:
                 folder_path_list.append(path)
                 folder_list.append(os.path.splitext(f)[0])
-    print()
-
-
 
 
 def create_header(curr_container_folder):
@@ -111,5 +104,6 @@ def pack_files(curr_container_folder, output_file):
 
 check_files()
 
-pack_files(test_folder, output_dat)
+for folder in folder_list:
+    pack_files(folder, folder + ".dat")
 print("end")
