@@ -6,6 +6,7 @@ from string import ascii_letters, digits
 import textwrap
 import shutil
 import re
+import sys
 
 def dat_ext_type1(*args):
     try:
@@ -114,8 +115,34 @@ def dat_ext_type2(*args):
         shutil.rmtree(extracted_folder_name)
         return None 
 
+def get_paths(arg_list):
+    # Gets .PAC and Extract Folder paths from command line arguments
+    global input_path
+    #global tbl_path
+    global output_path
+    global path
+    if len(arg_list) == 1: #If no arguments are passed...
+        # Use standard values
+        path = os.path.join(basedir, f)
+
+    elif len(arg_list) == 3: # If the right ammount of arguments is passed...
+        #Get values from list
+        input_path = arg_list[1]
+        #tbl_path = os.path.splitext(input_path)[0] + ".TBL"
+        output_path = arg_list[2]
+
+        path = input_path
+        
+    
+    else: #If none of those conditions are met
+        err_msg = "Wrong parameters!"
+        exit(err_msg) # Exit program with an error
+
+    
 ##Get working directory path
 basedir = os.getcwd()
+
+
 
 ##Get DAT files in working directory and and store their location aswell their filenames in arrays
 file_list = []
@@ -127,6 +154,8 @@ for f in os.listdir(basedir):
         file_name.append(os.path.splitext(f)[0])
     else:
         pass
+
+get_paths(sys.argv)
 
 ## Open files, check for dat_type then proceed with the extraction routine
 i = 0
