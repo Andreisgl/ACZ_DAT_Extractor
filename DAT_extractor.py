@@ -9,72 +9,67 @@ import re
 import sys
 
 def dat_ext_type1(*args):
-    try:
+
+    print("running dat_ext_type1")
+    current_filename = args[1]
+    start_offset = args[2]
+    file_offsets = []
+    file_sizes = []
+
+    zero_offset_list = []
+    zof_folder = "zof"
+    zero_offset_file = "./" + zof_folder + "/" + current_filename + ".zof"
+    if not os.path.exists(zof_folder):
+        os.mkdir(zof_folder)
+
+    dat_ext.seek(start_offset, 0)
+    nof = int.from_bytes(dat_ext.read(4), "little")
+    for x in range(nof):
+        f_offset = dat_ext.read(4)
+        file_offsets.append(int.from_bytes(f_offset, "little") + start_offset)
+
+    search_start = 0
+    for i in range(file_offsets.count(0)): #Count occurrences of 0 in file_offsets
+        current_zero_offset = file_offsets.index(0, search_start)
+        zero_offset_list.append(current_zero_offset)
+        search_start = current_zero_offset + 1
+        nof -= 1
         
-        print("running dat_ext_type1")
-        current_filename = args[1]
-        start_offset = args[2]
-        file_offsets = []
-        file_sizes = []
+    while 0 in file_offsets: # Remove all 0 offsets from file_offsets list
+        current_zero_offset = file_offsets.index(0)
+        file_offsets.pop(current_zero_offset)
 
-        zero_offset_list = []
-        zof_folder = "zof"
-        zero_offset_file = "./" + zof_folder + "/" + current_filename + ".zof"
-        if not os.path.exists(zof_folder):
-            os.mkdir(zof_folder)
-
-        dat_ext.seek(start_offset, 0)
-        nof = int.from_bytes(dat_ext.read(4), "little")
-        for x in range(nof):
-            f_offset = dat_ext.read(4)
-            file_offsets.append(int.from_bytes(f_offset, "little") + start_offset)
-
-        search_start = 0
-        for i in range(file_offsets.count(0)): #Count occurrences of 0 in file_offsets
-            current_zero_offset = file_offsets.index(0, search_start)
-            zero_offset_list.append(current_zero_offset)
-            search_start = current_zero_offset + 1
-            nof -= 1
-            
-        while 0 in file_offsets: # Remove all 0 offsets from file_offsets list
-            current_zero_offset = file_offsets.index(0)
-            file_offsets.pop(current_zero_offset)
-
-        file_offsets.append(file_size_check)
-        if os.path.isdir(current_filename):
-            shutil.rmtree(current_filename)
-        extracted_folder_name = str(current_filename)
-        os.mkdir(extracted_folder_name)
-        file_number = 0
-        sub_itir = 0
-        for x in range(nof):
-            dat_ext.seek(file_offsets[sub_itir])
-            file_ext = dat_ext.read(3)
-            file_ext_decoded = file_ext.decode('UTF-8', errors='ignore')
-            if set(file_ext_decoded).difference(ascii_letters + digits) or (len(file_ext_decoded) < 3):
-                file_extension = "unk"
-            else:
-                file_extension = str(file_ext_decoded).lower()
-            filename = str(current_filename) + "//" + str(file_number).zfill(4) + "." + file_extension
-            extracted_file = open(filename, "wb")
-            dat_ext.seek(file_offsets[sub_itir])
-            file_size = file_offsets[sub_itir + 1] - file_offsets[sub_itir]
-            data = dat_ext.read(file_size)
-            extracted_file.write(data)
-            extracted_file.close()
-            file_number += 1
-            sub_itir += 1
-
-            with open(zero_offset_file, 'wb') as ZOF:
-                for element in zero_offset_list:
-                    ZOF.write(element.to_bytes(byteorder="little", length=4))
-
-        return None
-    except Exception as error:
-        print(current_filename, "error")
+    file_offsets.append(file_size_check)
+    if os.path.isdir(current_filename):
+        shutil.rmtree(current_filename)
+    extracted_folder_name = str(current_filename)
+    os.mkdir(extracted_folder_name)
+    file_number = 0
+    sub_itir = 0
+    for x in range(nof):
+        dat_ext.seek(file_offsets[sub_itir])
+        file_ext = dat_ext.read(3)
+        file_ext_decoded = file_ext.decode('UTF-8', errors='ignore')
+        if set(file_ext_decoded).difference(ascii_letters + digits) or (len(file_ext_decoded) < 3):
+            file_extension = "unk"
+        else:
+            file_extension = str(file_ext_decoded).lower()
+        filename = str(current_filename) + "//" + str(file_number).zfill(4) + "." + file_extension
+        extracted_file = open(filename, "wb")
+        dat_ext.seek(file_offsets[sub_itir])
+        file_size = file_offsets[sub_itir + 1] - file_offsets[sub_itir]
+        data = dat_ext.read(file_size)
+        extracted_file.write(data)
         extracted_file.close()
-        shutil.rmtree(extracted_folder_name)
-        return None
+        file_number += 1
+        sub_itir += 1
+
+        with open(zero_offset_file, 'wb') as ZOF:
+            for element in zero_offset_list:
+                ZOF.write(element.to_bytes(byteorder="little", length=4))
+
+    return None
+    
 
 def dat_ext_type2(*args):
     try:
@@ -185,5 +180,6 @@ for files in file_list:
             i += 1
             pass
         else:
-            dat_ext_type1(dat_ext, current_filename, start_offset)
+            #dat_ext_type1(dat_ext, current_filename, start_offset)
+            dat_ext_type1(dat_ext, "C:/Users/andre/Desktop", start_offset)
             i += 1
