@@ -114,6 +114,10 @@ def dat_ext_type2(*args):
         shutil.rmtree(extracted_folder_name)
         return None 
 
+# Analysis code
+ext_type_index = []
+
+
 ##Get working directory path
 basedir = os.getcwd()
 
@@ -147,6 +151,7 @@ for files in file_list:
     dat_type_array = re.compile(b'\x10\x00\x00\x00.\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00')
     if (re.match(dat_type_array, dat_type_check)):
         dat_ext_type2(dat_ext, current_filename, file_size_check)
+        ext_type_index.append((current_filename, 2)) ###
         i += 1
     else:
         dat_ext.seek(0, 0)
@@ -157,4 +162,50 @@ for files in file_list:
             pass
         else:
             dat_ext_type1(dat_ext, current_filename, start_offset)
+            ext_type_index.append((current_filename, 1)) ###
             i += 1
+
+
+print('Assembling analysis data')
+
+print(ext_type_index)
+
+import csv
+
+DELIMITER = '\\'
+QUOTECHAR = '`'
+
+
+def write_row_line_data_csv(data, many_lines, file_path):
+    '''
+    This method writes data to the file specified in 'file path'
+    Parameters:
+    data: Data to be written
+    many_lines: Determines if you are writing a single line or many lines
+    file_path: Path to the desired file
+    '''
+    global DELIMITER
+    global QUOTECHAR
+    # Write to the csv file.
+    #
+    # If append == True, append to file.
+    # Else, overwrite it.
+    #
+    # If many_lines, write all items of iterables as rows
+    # Else, write a single row only
+
+    #mode = ''
+    #if append:
+    #    mode = 'a'
+    #else:
+    #    mode = 'w'
+#
+    with open(file_path, 'w', encoding='UTF8', newline='') as line_file: # Create file
+            line_writer = csv.writer(line_file, delimiter=DELIMITER, quotechar=QUOTECHAR)
+            if many_lines:
+                line_writer.writerows(data)
+            else:
+                line_writer.writerow(data)
+
+
+write_row_line_data_csv(ext_type_index, True, 'file_analysis.csv')
